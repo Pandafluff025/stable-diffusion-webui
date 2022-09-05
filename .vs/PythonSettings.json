@@ -1,0 +1,4 @@
+{
+  "Interpreter": "Global|VisualStudio|stable D",
+  "TestFramework": "Pytest"
+}

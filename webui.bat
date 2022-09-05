@@ -1,132 +1,62 @@
 @echo off
 
-set PYTHON=python
-set GIT=git
-set COMMANDLINE_ARGS=
-set VENV_DIR=venv
+if not defined PYTHON (set PYTHON=python)
+if not defined VENV_DIR (set "VENV_DIR=%~dp0%venv")
+
+
+set ERROR_REPORTING=FALSE
 
 mkdir tmp 2>NUL
 
-set TORCH_COMMAND=pip install torch==1.12.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
-set REQS_FILE=requirements_versions.txt
-
 %PYTHON% -c "" >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :check_git
+if %ERRORLEVEL% == 0 goto :check_pip
 echo Couldn't launch python
 goto :show_stdout_stderr
 
-:check_git
-%GIT% --help >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :setup_venv
-echo Couldn't launch git
+:check_pip
+%PYTHON% -mpip --help >tmp/stdout.txt 2>tmp/stderr.txt
+if %ERRORLEVEL% == 0 goto :start_venv
+if "%PIP_INSTALLER_LOCATION%" == "" goto :show_stdout_stderr
+%PYTHON% "%PIP_INSTALLER_LOCATION%" >tmp/stdout.txt 2>tmp/stderr.txt
+if %ERRORLEVEL% == 0 goto :start_venv
+echo Couldn't install pip
 goto :show_stdout_stderr
 
-:setup_venv
-if [%VENV_DIR%] == [] goto :skip_venv
+:start_venv
+if ["%VENV_DIR%"] == ["-"] goto :skip_venv
+if ["%SKIP_VENV%"] == ["1"] goto :skip_venv
 
-dir %VENV_DIR%\Scripts\Python.exe >tmp/stdout.txt 2>tmp/stderr.txt
+dir "%VENV_DIR%\Scripts\Python.exe" >tmp/stdout.txt 2>tmp/stderr.txt
 if %ERRORLEVEL% == 0 goto :activate_venv
 
 for /f "delims=" %%i in ('CALL %PYTHON% -c "import sys; print(sys.executable)"') do set PYTHON_FULLNAME="%%i"
 echo Creating venv in directory %VENV_DIR% using python %PYTHON_FULLNAME%
-%PYTHON_FULLNAME% -m venv %VENV_DIR% >tmp/stdout.txt 2>tmp/stderr.txt
+%PYTHON_FULLNAME% -m venv "%VENV_DIR%" >tmp/stdout.txt 2>tmp/stderr.txt
 if %ERRORLEVEL% == 0 goto :activate_venv
-echo Unable to create venv in directory %VENV_DIR%
+echo Unable to create venv in directory "%VENV_DIR%"
 goto :show_stdout_stderr
 
 :activate_venv
-set PYTHON=%~dp0%VENV_DIR%\Scripts\Python.exe
-%PYTHON% --version
+set PYTHON="%VENV_DIR%\Scripts\Python.exe"
 echo venv %PYTHON%
-goto :install_torch
 
 :skip_venv
-%PYTHON% --version
+if [%ACCELERATE%] == ["True"] goto :accelerate
+goto :launch
 
-:install_torch
-
-%PYTHON% -c "import torch" >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :check_gpu
-echo Installing torch...
-%PYTHON% -m %TORCH_COMMAND% >tmp/stdout.txt 2>tmp/stderr.txt
-
-if %ERRORLEVEL% == 0 goto :check_gpu
-echo Failed to install torch
-goto :show_stdout_stderr
-
-:check_gpu
-%PYTHON% -c "import torch; assert torch.cuda.is_available(), 'CUDA is not available'" >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :install_sd_reqs
-echo Torch is not able to use GPU
-goto :show_stdout_stderr
-
-:install_sd_reqs
-%PYTHON% -c "import transformers" >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :install_k_diff
-echo Installing SD requirements...
-%PYTHON% -m pip install transformers==4.19.2 diffusers invisible-watermark >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :install_k_diff
-goto :show_stdout_stderr
-
-:install_k_diff
-%PYTHON% -c "import k_diffusion.sampling" >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :install_GFPGAN
-echo Installing K-Diffusion...
-%PYTHON% -m pip install git+https://github.com/crowsonkb/k-diffusion.git >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :install_GFPGAN
-goto :show_stdout_stderr
-
-
-:install_GFPGAN
-%PYTHON% -c "import gfpgan" >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :install_reqs
-echo Installing GFPGAN
-%PYTHON% -m pip install git+https://github.com/TencentARC/GFPGAN.git >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :install_reqs
-goto :show_stdout_stderr
-
-:install_reqs
-%PYTHON% -c "import omegaconf" >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :make_dirs
-echo Installing requirements...
-%PYTHON% -m pip install -r %REQS_FILE% >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :update_numpy
-goto :show_stdout_stderr
-:update_numpy
-%PYTHON% -m pip install -U numpy >tmp/stdout.txt 2>tmp/stderr.txt
-
-:make_dirs
-mkdir repositories 2>NUL
-
-if exist repositories\stable-diffusion goto :clone_transformers
-echo Cloning Stable Difusion repository...
-%GIT% clone https://github.com/CompVis/stable-diffusion.git repositories\stable-diffusion >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :clone_transformers
-goto :show_stdout_stderr
-
-:clone_transformers
-if exist repositories\taming-transformers goto :check_model
-echo Cloning Taming Transforming repository...
-%GIT% clone https://github.com/CompVis/taming-transformers.git repositories\taming-transformers >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :check_model
-goto :show_stdout_stderr
-
-:check_model
-dir model.ckpt >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :check_gfpgan
-echo Stable Diffusion model not found: you need to place model.ckpt file into same directory as this file.
-goto :show_stdout_stderr
-
-:check_gfpgan
-dir GFPGANv1.3.pth >tmp/stdout.txt 2>tmp/stderr.txt
-if %ERRORLEVEL% == 0 goto :launch
-echo GFPGAN not found: you need to place GFPGANv1.3.pth file into same directory as this file.
-echo Face fixing feature will not work.
+:accelerate
+echo Checking for accelerate
+set ACCELERATE="%VENV_DIR%\Scripts\accelerate.exe"
+if EXIST %ACCELERATE% goto :accelerate_launch
 
 :launch
-echo Launching webui.py...
-cd repositories\stable-diffusion
-%PYTHON% ../../webui.py %COMMANDLINE_ARGS%
+%PYTHON% launch.py %*
+pause
+exit /b
+
+:accelerate_launch
+echo Accelerating
+%ACCELERATE% launch --num_cpu_threads_per_process=6 launch.py
 pause
 exit /b
 

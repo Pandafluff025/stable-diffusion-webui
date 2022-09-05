@@ -3,168 +3,160 @@ A browser interface based on Gradio library for Stable Diffusion.
 
 ![](screenshot.png)
 
-## Feature showcase
-
-[<font size="12">Detailed feature showcase with images, art by Greg Rutkowski</font>](https://github.com/AUTOMATIC1111/stable-diffusion-webui-feature-showcase)
-
+## Features
+[Detailed feature showcase with images](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Features):
 - Original txt2img and img2img modes
-- One click install and run script (but you still must install python, git and CUDA)
+- One click install and run script (but you still must install python and git)
 - Outpainting
 - Inpainting
-- Prompt matrix
-- Stable Diffusion upscale
-- Attention
-- Loopback
-- X/Y plot
+- Color Sketch
+- Prompt Matrix
+- Stable Diffusion Upscale
+- Attention, specify parts of text that the model should pay more attention to
+    - a man in a ((tuxedo)) - will pay more attention to tuxedo
+    - a man in a (tuxedo:1.21) - alternative syntax
+    - select text and press ctrl+up or ctrl+down to automatically adjust attention to selected text (code contributed by anonymous user)
+- Loopback, run img2img processing multiple times
+- X/Y/Z plot, a way to draw a 3 dimensional plot of images with different parameters
 - Textual Inversion
+    - have as many embeddings as you want and use any names you like for them
+    - use multiple embeddings with different numbers of vectors per token
+    - works with half precision floating point numbers
+    - train embeddings on 8GB (also reports of 6GB working)
 - Extras tab with:
-  - GFPGAN, neural network that fixes faces
-  - RealESRGAN, neural network upscaler
-  - ESRGAN, neural network with a lot of third party models
+    - GFPGAN, neural network that fixes faces
+    - CodeFormer, face restoration tool as an alternative to GFPGAN
+    - RealESRGAN, neural network upscaler
+    - ESRGAN, neural network upscaler with a lot of third party models
+    - SwinIR and Swin2SR([see here](https://github.com/AUTOMATIC1111/stable-diffusion-webui/pull/2092)), neural network upscalers
+    - LDSR, Latent diffusion super resolution upscaling
 - Resizing aspect ratio options
 - Sampling method selection
+    - Adjust sampler eta values (noise multiplier)
+    - More advanced noise setting options
 - Interrupt processing at any time
-- 4GB videocard support
+- 4GB video card support (also reports of 2GB working)
 - Correct seeds for batches
-- Prompt length validation
-- Generation parameters added as text to PNG
-- Tab to view an existing picture's generation parameters
+- Live prompt token length validation
+- Generation parameters
+     - parameters you used to generate images are saved with that image
+     - in PNG chunks for PNG, in EXIF for JPEG
+     - can drag the image to PNG info tab to restore generation parameters and automatically copy them into UI
+     - can be disabled in settings
+     - drag and drop an image/text-parameters to promptbox
+- Read Generation Parameters Button, loads parameters in promptbox to UI
 - Settings page
-- Running custom code from UI
-- Mouseover hints fo most UI elements
+- Running arbitrary python code from UI (must run with --allow-code to enable)
+- Mouseover hints for most UI elements
 - Possible to change defaults/mix/max/step values for UI elements via text config
+- Tiling support, a checkbox to create images that can be tiled like textures
+- Progress bar and live image generation preview
+    - Can use a separate neural network to produce previews with almost none VRAM or compute requirement
+- Negative prompt, an extra text field that allows you to list what you don't want to see in generated image
+- Styles, a way to save part of prompt and easily apply them via dropdown later
+- Variations, a way to generate same image but with tiny differences
+- Seed resizing, a way to generate same image but at slightly different resolution
+- CLIP interrogator, a button that tries to guess prompt from an image
+- Prompt Editing, a way to change prompt mid-generation, say to start making a watermelon and switch to anime girl midway
+- Batch Processing, process a group of files using img2img
+- Img2img Alternative, reverse Euler method of cross attention control
+- Highres Fix, a convenience option to produce high resolution pictures in one click without usual distortions
+- Reloading checkpoints on the fly
+- Checkpoint Merger, a tab that allows you to merge up to 3 checkpoints into one
+- [Custom scripts](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Custom-Scripts) with many extensions from community
+- [Composable-Diffusion](https://energy-based-model.github.io/Compositional-Visual-Generation-with-Composable-Diffusion-Models/), a way to use multiple prompts at once
+     - separate prompts using uppercase `AND`
+     - also supports weights for prompts: `a cat :1.2 AND a dog AND a penguin :2.2`
+- No token limit for prompts (original stable diffusion lets you use up to 75 tokens)
+- DeepDanbooru integration, creates danbooru style tags for anime prompts
+- [xformers](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Xformers), major speed increase for select cards: (add --xformers to commandline args)
+- via extension: [History tab](https://github.com/yfszzx/stable-diffusion-webui-images-browser): view, direct and delete images conveniently within the UI
+- Generate forever option
+- Training tab
+     - hypernetworks and embeddings options
+     - Preprocessing images: cropping, mirroring, autotagging using BLIP or deepdanbooru (for anime)
+- Clip skip
+- Hypernetworks
+- Loras (same as Hypernetworks but more pretty)
+- A sparate UI where you can choose, with preview, which embeddings, hypernetworks or Loras to add to your prompt. 
+- Can select to load a different VAE from settings screen
+- Estimated completion time in progress bar
+- API
+- Support for dedicated [inpainting model](https://github.com/runwayml/stable-diffusion#inpainting-with-stable-diffusion) by RunwayML.
+- via extension: [Aesthetic Gradients](https://github.com/AUTOMATIC1111/stable-diffusion-webui-aesthetic-gradients), a way to generate images with a specific aesthetic by using clip images embeds (implementation of [https://github.com/vicgalle/stable-diffusion-aesthetic-gradients](https://github.com/vicgalle/stable-diffusion-aesthetic-gradients))
+- [Stable Diffusion 2.0](https://github.com/Stability-AI/stablediffusion) support - see [wiki](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Features#stable-diffusion-20) for instructions
+- [Alt-Diffusion](https://arxiv.org/abs/2211.06679) support - see [wiki](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Features#alt-diffusion) for instructions
+- Now without any bad letters!
+- Load checkpoints in safetensors format
+- Eased resolution restriction: generated image's domension must be a multiple of 8 rather than 64
+- Now with a license!
+- Reorder elements in the UI from settings screen
+- 
 
-## Installing and running
+## Installation and Running
+Make sure the required [dependencies](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Dependencies) are met and follow the instructions available for both [NVidia](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-NVidia-GPUs) (recommended) and [AMD](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Install-and-Run-on-AMD-GPUs) GPUs.
 
-You need [python](https://www.python.org/downloads/windows/) and [git](https://git-scm.com/download/win)
-installed to run this, and an NVidia videocard.
+Alternatively, use online services (like Google Colab):
 
-I tested the installation to work Windows with Python 3.8.10, and with Python 3.10.6. You may be able
-to have success with different versions.
+- [List of Online Services](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Online-Services)
 
-You need `model.ckpt`, Stable Diffusion model checkpoint, a big file containing the neural network weights. You
-can obtain it from the following places:
- - [official download](https://huggingface.co/CompVis/stable-diffusion-v-1-4-original)
- - [file storage](https://drive.yerf.org/wl/?id=EBfTrmcCCUAGaQBXVIj5lJmEhjoP1tgl)
- - magnet:?xt=urn:btih:3a4a612d75ed088ea542acac52f9f45987488d1c&dn=sd-v1-4.ckpt&tr=udp%3a%2f%2ftracker.openbittorrent.com%3a6969%2fannounce&tr=udp%3a%2f%2ftracker.opentrackr.org%3a1337
+### Automatic Installation on Windows
+1. Install [Python 3.10.6](https://www.python.org/downloads/windows/), checking "Add Python to PATH"
+2. Install [git](https://git-scm.com/download/win).
+3. Download the stable-diffusion-webui repository, for example by running `git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git`.
+4. Place stable diffusion checkpoint (`model.ckpt`) in the `models/Stable-diffusion` directory (see [dependencies](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Dependencies) for where to get it).
+5. Run `webui-user.bat` from Windows Explorer as normal, non-administrator, user.
 
-You optionally can use GPFGAN to improve faces, then you'll need to download the model from [here](https://github.com/TencentARC/GFPGAN/releases/download/v1.3.0/GFPGANv1.3.pth).
-
-To use ESRGAN models, put them into ESRGAN directory in the same location as webui.py. A file will be loaded
-as model if it has .pth extension. Grab models from the [Model Database](https://upscale.wiki/wiki/Model_Database).
-
-### Automatic installation/launch
-
-- install [Python 3.10.6](https://www.python.org/downloads/windows/)
-- install [git](https://git-scm.com/download/win)
-- install [CUDA 11.3](https://developer.nvidia.com/cuda-11.3.0-download-archive?target_os=Windows&target_arch=x86_64)
-- place `model.ckpt` into webui directory, next to `webui.bat`.
-- _*(optional)*_ place `GFPGANv1.3.pth` into webui directory, next to `webui.bat`.
-- run `webui.bat` from Windows Explorer.
-
-#### Troublehooting:
-
-- According to reports, intallation currently does not work in a directory with spaces in filenames.
-- if your version of Python is not in PATH (or if another version is), edit `webui.bat`, change the line `set PYTHON=python` to say the full path to your python executable: `set PYTHON=B:\soft\Python310\python.exe`. You can do this for python, but not for git.
-- if you get out of memory errors and your videocard has low amount of VRAM (4GB), edit `webui.bat`, change line 5 to from `set COMMANDLINE_ARGS=` to `set COMMANDLINE_ARGS=--medvram` (see below for other possible options)
-- installer creates python virtual environment, so none of installed modules will affect your system installation of python if you had one prior to installing this.
-- to prevent the creation of virtual environment and use your system python, edit `webui.bat` replacing `set VENV_DIR=venv` with `set VENV_DIR=`.
-- webui.bat installs requirements from files `requirements_versions.txt`, which lists versions for modules specifically compatible with Python 3.10.6. If you choose to install for a different version of python, editing `webui.bat` to have `set REQS_FILE=requirements.txt` instead of `set REQS_FILE=requirements_versions.txt` may help (but I still reccomend you to just use the recommended version of python).
-- if you feel you broke something and want to reinstall from scratch, delete directories: `venv`, `repositories`.
-
-### Manual instructions
-Alternatively, if you don't want to run webui.bat, here are instructions for installing
-everything by hand:
-
-```commandline
-:: crate a directory somewhere for stable diffusion and open cmd in it;
-:: make sure you are in the right directory; the command must output the directory you chose
-echo %cd%
-
-:: install torch with CUDA support. See https://pytorch.org/get-started/locally/ for more instructions if this fails.
-pip install torch --extra-index-url https://download.pytorch.org/whl/cu113
-
-:: check if torch supports GPU; this must output "True". You need CUDA 11. installed for this. You might be able to use
-:: a different version, but this is what I tested.
-python -c "import torch; print(torch.cuda.is_available())"
-
-:: clone Stable Diffusion repositories
-git clone https://github.com/CompVis/stable-diffusion.git
-git clone https://github.com/CompVis/taming-transformers
-
-:: install requirements of Stable Diffusion
-pip install transformers==4.19.2 diffusers invisible-watermark
-
-:: install k-diffusion
-pip install git+https://github.com/crowsonkb/k-diffusion.git
-
-:: (optional) install GFPGAN to fix faces
-pip install git+https://github.com/TencentARC/GFPGAN.git
-
-:: go into stable diffusion's repo directory
-cd stable-diffusion
-
-:: clone web ui
-git clone https://github.com/AUTOMATIC1111/stable-diffusion-webui.git
-
-:: install requirements of web ui
-pip install -r stable-diffusion-webui/requirements.txt
-
-:: update numpy to latest version
-pip install -U numpy
-
-:: (outside of command line) put stable diffusion model into models/ldm/stable-diffusion-v1/model.ckpt; you'll have
-:: to create one missing directory;
-:: the command below must output something like: 1 File(s) 4,265,380,512 bytes
-dir models\ldm\stable-diffusion-v1\model.ckpt
-
-:: (outside of command line) put the GFPGAN model into same directory as webui script
-:: the command below must output something like: 1 File(s) 348,632,874 bytes
-dir stable-diffusion-webui\GFPGANv1.3.pth
+### Automatic Installation on Linux
+1. Install the dependencies:
+```bash
+# Debian-based:
+sudo apt install wget git python3 python3-venv
+# Red Hat-based:
+sudo dnf install wget git python3
+# Arch-based:
+sudo pacman -S wget git python3
+```
+2. To install in `/home/$(whoami)/stable-diffusion-webui/`, run:
+```bash
+bash <(wget -qO- https://raw.githubusercontent.com/AUTOMATIC1111/stable-diffusion-webui/master/webui.sh)
 ```
 
-After that the installation is finished.
+### Installation on Apple Silicon
 
-Run the command to start web ui:
+Find the instructions [here](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Installation-on-Apple-Silicon).
 
-```
-python stable-diffusion-webui/webui.py
-```
+## Contributing
+Here's how to add code to this repo: [Contributing](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki/Contributing)
 
-If you have a 4GB video card, run the command with either `--lowvram` or `--medvram` argument:
-
-```
-python stable-diffusion-webui/webui.py --medvram
-```
-
-After a while, you will get a message like this:
-
-```
-Running on local URL:  http://127.0.0.1:7860/
-```
-
-Open the URL in browser, and you are good to go.
-
-
-### What options to use for low VRAM videocardsd?
-- If you have 4GB VRAM and want to make 512x512 (or maybe up to 640x640) images, use `--medvram`.
-- If you have 4GB VRAM and want to make 512x512 images, but you get an out of memory error with `--medvram`, use `--opt-split-attention` instead.
-- If you have 4GB VRAM and want to make 512x512 images, and you still get an out of memory error, use `--lowvram --always-batch-cond-uncond` instead.
-- If you have 4GB VRAM and want to make images larger than you can with `--medvram`, use `--lowvram`.
-- If you have more VRAM and want to make larger images than you can usually make, use `--medvram`. You can use `--lowvram`
-also but the effect will likely be barely noticeable.
-- Otherwise, do not use any of those.
-
-Extra: if you get a green screen instead of generated pictures, you have a card that doesn't support half
-precision floating point numbers. You must use `--precision full --no-half` in addition to other flags,
-and the model will take much more space in VRAM.
+## Documentation
+The documentation was moved from this README over to the project's [wiki](https://github.com/AUTOMATIC1111/stable-diffusion-webui/wiki).
 
 ## Credits
+Licenses for borrowed code can be found in `Settings -> Licenses` screen, and also in `html/licenses.html` file.
+
 - Stable Diffusion - https://github.com/CompVis/stable-diffusion, https://github.com/CompVis/taming-transformers
 - k-diffusion - https://github.com/crowsonkb/k-diffusion.git
 - GFPGAN - https://github.com/TencentARC/GFPGAN.git
+- CodeFormer - https://github.com/sczhou/CodeFormer
 - ESRGAN - https://github.com/xinntao/ESRGAN
-- Ideas for optimizations and some code (from users) - https://github.com/basujindal/stable-diffusion
+- SwinIR - https://github.com/JingyunLiang/SwinIR
+- Swin2SR - https://github.com/mv-lab/swin2sr
+- LDSR - https://github.com/Hafiidz/latent-diffusion
+- MiDaS - https://github.com/isl-org/MiDaS
+- Ideas for optimizations - https://github.com/basujindal/stable-diffusion
+- Cross Attention layer optimization - Doggettx - https://github.com/Doggettx/stable-diffusion, original idea for prompt editing.
+- Cross Attention layer optimization - InvokeAI, lstein - https://github.com/invoke-ai/InvokeAI (originally http://github.com/lstein/stable-diffusion)
+- Sub-quadratic Cross Attention layer optimization - Alex Birch (https://github.com/Birch-san/diffusers/pull/1), Amin Rezaei (https://github.com/AminRezaei0x443/memory-efficient-attention)
+- Textual Inversion - Rinon Gal - https://github.com/rinongal/textual_inversion (we're not using his code, but we are using his ideas).
 - Idea for SD upscale - https://github.com/jquesnelle/txt2imghd
+- Noise generation for outpainting mk2 - https://github.com/parlance-zz/g-diffuser-bot
+- CLIP interrogator idea and borrowing some code - https://github.com/pharmapsychotic/clip-interrogator
+- Idea for Composable Diffusion - https://github.com/energy-based-model/Compositional-Visual-Generation-with-Composable-Diffusion-Models-PyTorch
+- xformers - https://github.com/facebookresearch/xformers
+- DeepDanbooru - interrogator for anime diffusers https://github.com/KichangKim/DeepDanbooru
+- Sampling in float32 precision from a float16 UNet - marunine for the idea, Birch-san for the example Diffusers implementation (https://github.com/Birch-san/diffusers-play/tree/92feee6)
+- Instruct pix2pix - Tim Brooks (star), Aleksander Holynski (star), Alexei A. Efros (no star) - https://github.com/timothybrooks/instruct-pix2pix
+- Security advice - RyotaK
 - Initial Gradio script - posted on 4chan by an Anonymous user. Thank you Anonymous user.
 - (You)
