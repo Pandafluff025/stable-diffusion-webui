@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import importlib
 
 class CondFunc:
@@ -16,6 +17,26 @@ class CondFunc:
             orig_func = getattr(resolved_obj, func_path[-1])
             setattr(resolved_obj, func_path[-1], lambda *args, **kwargs: self(*args, **kwargs))
         self.__init__(orig_func, sub_func, cond_func)
+=======
+import importlib
+
+class CondFunc:
+    def __new__(cls, orig_func, sub_func, cond_func):
+        self = super(CondFunc, cls).__new__(cls)
+        if isinstance(orig_func, str):
+            func_path = orig_func.split('.')
+            for i in range(len(func_path)-1, -1, -1):
+                try:
+                    resolved_obj = importlib.import_module('.'.join(func_path[:i]))
+                    break
+                except ImportError:
+                    pass
+            for attr_name in func_path[i:-1]:
+                resolved_obj = getattr(resolved_obj, attr_name)
+            orig_func = getattr(resolved_obj, func_path[-1])
+            setattr(resolved_obj, func_path[-1], lambda *args, **kwargs: self(*args, **kwargs))
+        self.__init__(orig_func, sub_func, cond_func)
+>>>>>>> ea9bd9fc7409109adcd61b897abc2c8881161256
         return lambda *args, **kwargs: self(*args, **kwargs)
     def __init__(self, orig_func, sub_func, cond_func):
         self.__orig_func = orig_func
