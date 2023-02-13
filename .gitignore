@@ -33,3 +33,13 @@ notification.mp3
 /test/stdout.txt
 /test/stderr.txt
 /cache.json
+stable-diffusion-webui-master/VisionXformer/
+stable-diffusion-webui-master/diffusers/
+stable-diffusion-webui-master/repos/stable-diffusion-webui/
+stable-diffusion-webui-master/repos/Pandafluff025/stable-diffusion-webui-promptgen/
+stable-diffusion-webui-master/repositories/BLIP/
+stable-diffusion-webui-master/repositories/CodeFormer/
+stable-diffusion-webui-master/repositories/k-diffusion/
+stable-diffusion-webui-master/repositories/stable-diffusion-stability-ai/
+stable-diffusion-webui-master/repositories/taming-transformers/
+stable-diffusion-webui-master/transformers/
